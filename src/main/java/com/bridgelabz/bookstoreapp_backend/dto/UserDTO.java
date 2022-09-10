@@ -1,6 +1,5 @@
 package com.bridgelabz.bookstoreapp_backend.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
@@ -25,10 +24,9 @@ public class UserDTO {
     @NotEmpty(message = "password cannot be empty")
     private String password;
 
-    @JsonFormat(pattern="dd MMM yyyy")
     private LocalDate dob;
 
-    @JsonFormat(pattern="dd MMM yyyy")
+
     private LocalDate registeredDate;
 
 

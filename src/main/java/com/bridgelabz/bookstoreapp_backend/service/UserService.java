@@ -32,8 +32,12 @@ public class UserService implements  IUserService {
     @Autowired
     private TokenUtility tokenUtility;
 
+
     @Override
-    public UserRegistration registerUserInApp(UserDTO userDTO) {
+    public Integer registerUserInApp(UserDTO userDTO) {
+        UserRegistration userStatus = userRepository.findByEmailId(userDTO.getEmail());
+        if(!(userStatus==null))
+            return 1;
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         UserRegistration user = modelMapper.map(userDTO, UserRegistration.class);
         String otp = getRandomNumber();
@@ -43,21 +47,22 @@ public class UserService implements  IUserService {
         emailService.sendEmail(user.getEmail(), "Otp for Verification", "Otp sent for verification purpose"
                 + user.getFirstName() + "Please Click here to verify the Otp :-   "
                 + "http://localhost:8080/user/verifyOtp" + intOtp);
-        return user;
+           return 0;
     }
 
     @Override
-    public Boolean verifyOtp(String email, Integer otp) {
+    public int verifyOtp(String email, Integer otp) {
         UserRegistration user = userRepository.findByEmailId(email);
+        if (user == null)
+            return 0;
         Integer serveResponseOtp = user.getOtp();
-        if (otp == null)
-            return false;
+
         if (!(otp.equals(serveResponseOtp)))
-            return false;
+            return 2;
         userRepository.changeVerified(email);
         emailService.sendEmail(user.getEmail(), "Verification Successful", "Hi " + user.getFirstName() + ", You have successfully " +
                 "verified your account. You can now login using Your email and password using this link. " + "http://localhost:8080/user/login");
-        return true;
+        return 1;
     }
 
     public static String getRandomNumber() {
@@ -67,21 +72,21 @@ public class UserService implements  IUserService {
     }
 
     @Override
-    public String loginUser(String email, String password) {
+    public int loginUser(String email, String password) {
         UserRegistration userLoginDetails = userRepository.findByEmailId(email);
 
         if (userLoginDetails == null)
-            return "User not available, please enter your correct email and password";
+            return 0;
         if (userLoginDetails.getVerify() == null)
-            return "User not verified. please do the verification and try again. ";
+            return 3;
         if (!(passwordEncoder.matches(password, userLoginDetails.getPassword())))
-            return "Entered your User name or password incorrect";
+            return 2;
         userRepository.save(userLoginDetails);
         String token = getToken(userLoginDetails.getEmail());
-        return "User Login successfully and token is " + token;
+        return 1;
     }
 
-    private String getToken(String email) {
+    public String getToken(String email) {
         UserRegistration userRegistration = userRepository.findByEmailId(email);
         String token = tokenUtility.createToken(userRegistration.getUserId());
         return token;
@@ -120,6 +125,10 @@ public class UserService implements  IUserService {
         System.out.println("newPassword: " + newPassword);
         userRepository.updateNewPassword(email, newPassword);
         return "Password updated successfully";
+    }
+    @Override
+    public Object getIdByToken(String token) {
+        return tokenUtility.decodeToken(token);
     }
 }
 

@@ -1,0 +1,57 @@
+package com.bridgelabz.bookstoreapp_backend.controller;
+
+import com.bridgelabz.bookstoreapp_backend.dto.ResponseDTO;
+import com.bridgelabz.bookstoreapp_backend.dto.WishListDTO;
+import com.bridgelabz.bookstoreapp_backend.model.Wishlist;
+import com.bridgelabz.bookstoreapp_backend.service.WishlistService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@CrossOrigin(origins = "http://localhost:4200/")
+@RestController
+@RequestMapping("/wishlist")
+public class WishlistController {
+    @Autowired
+    private WishlistService wishlistService;
+
+    @PostMapping("/save")
+    public ResponseEntity<ResponseDTO> addToWishlist(@RequestBody WishListDTO wishlistdto){
+        Wishlist wishlist = wishlistService.addToWishlist(wishlistdto);
+        ResponseDTO dto = new ResponseDTO("Wishlist added successfully",wishlist);
+        return new ResponseEntity(dto, HttpStatus.OK);
+    }
+    @GetMapping("/retrieveAll")
+    public ResponseEntity<ResponseDTO> getAllWishlists(){
+        List<Wishlist> wishlist = wishlistService.getAllWishlists();
+        ResponseDTO dto = new ResponseDTO("All Wishlist records retrieved successfully",wishlist);
+        return new ResponseEntity(dto,HttpStatus.OK);
+    }
+    @GetMapping("/retrieve/{id}")
+    public ResponseEntity<ResponseDTO> getWishlistRecordById(@PathVariable Integer id){
+        List<Wishlist> wishlist = wishlistService.getWishlistRecordById(id);
+        ResponseDTO dto = new ResponseDTO("Wishlist record retrieved successfully for given id",wishlist);
+        return new ResponseEntity(dto,HttpStatus.OK);
+    }
+    @GetMapping("/retrieveByBookId/{bookId}")
+    public ResponseEntity<ResponseDTO> getWishlistRecordByBookId(@PathVariable Integer bookId){
+        List<Wishlist> wishlist = wishlistService.getWishlistRecordByBookId(bookId);
+        ResponseDTO dto = new ResponseDTO("Wishlist record retrieved successfully for given book id",wishlist);
+        return new ResponseEntity(dto,HttpStatus.OK);
+    }
+    @GetMapping("/retrieveByUserId/{userId}")
+    public ResponseEntity<ResponseDTO> getWishlistRecordByUserId(@PathVariable Integer userId){
+        List<Wishlist> wishlist = wishlistService.getWishlistRecordByUserId(userId);
+        ResponseDTO dto = new ResponseDTO("Wishlist record retrieved successfully for given user id",wishlist);
+        return new ResponseEntity(dto, HttpStatus.OK);
+    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ResponseDTO> deleteWishlistRecordById(@PathVariable Integer id){
+        Wishlist wishlist = wishlistService.deleteWishlistRecordById(id);
+        ResponseDTO dto = new ResponseDTO("Wishlist record deleted successfully for given id",wishlist);
+        return new ResponseEntity(dto,HttpStatus.OK);
+    }
+}

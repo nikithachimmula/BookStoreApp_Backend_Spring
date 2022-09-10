@@ -17,7 +17,6 @@ public class UserRegistration {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-
     private Integer userId;
 
     private String firstName;
